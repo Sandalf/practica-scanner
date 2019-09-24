@@ -17,6 +17,19 @@ guion bajo (_) y el apóstrofo ('):
 4. No son palabras reservadas.
 Los siguientes son ejemplos de identificadores: x, _abc, x_4', _3x, cont''.
 
+## 2. Palabras reservadas
+Sólo se contemplan las siguientes: identity, transpose y throw.
+
+## 3. Números octales
+Un número octal es una secuencia de símbolos octales que comienza con 0 (cero). Ningún símbolo alfabético o el guión bajo puede aparecer inmediatamente después de esta secuencia.
+
+Por ejemplo 034, 0, y 01 son números octales, pero 098 no lo es.
+
+## 4. Números hexadecimales
+Un número hexadecimal es una secuencia de longitud par pero no vacía de símbolos hexadecimales que es precedida por la secuencia 0x o 0X. Ningún símbolo alfabético o el guión bajo puede aparecer inmediatamente después de esta secuencia.
+
+Por ejemplo 0x34, 0xA4f5, y 0XABCD son números hexadecimales, pero 0x, 0x98e y F3AE no lo son.
+
 ## Comandos
 compilacion
 ```

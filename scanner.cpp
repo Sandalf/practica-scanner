@@ -98,8 +98,7 @@ token id() {
         return _id;
     }
 
-    fail();
-    printf("Token no identificado %s: ", match);
+    fail();    
     return _err;
 }
 
@@ -189,7 +188,7 @@ int line(long _q) {
 token next() {
     wsp();
     if (lastq == q && q != 0) return _eof;
-
+    
     token tid = id();
     if (tid != _err) return tid;
 
@@ -200,7 +199,7 @@ token next() {
     q = 0;
     fail();
     printf("Error en posición %ld\n", lastq);
-    printf("Lineas %d\n", line(lastq));
+    printf("Linea %d\n", line(lastq));
     
     return _err;
 }
