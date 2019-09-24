@@ -14,6 +14,7 @@ int main()
 
         switch (t) {
             case _id: printf("Identificador\n"); break;
+            case _oct: printf("Octal\n"); break;
             case _eof: printf("EOF\n"); break;
             case _err: printf("Error\n"); break;
             default: break;

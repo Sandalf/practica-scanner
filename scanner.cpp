@@ -51,6 +51,23 @@ bool isnatural(char c) {
     return false;
 }
 
+bool isoctal(char c) {
+    switch (c) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        return true;
+        break;
+    }
+
+    return false;
+}
+
 token id() {
     int actual = 0;
     int prior = 0;
@@ -102,9 +119,11 @@ token id() {
     return _err;
 }
 
-token num() {
+token oct() {
     int actual = 0;
     int prior = 0;
+    char match[100] = "";
+    int i = 0;
 
     while(actual != udef) {
         prior = actual;
@@ -112,40 +131,27 @@ token num() {
 
         switch (actual) {
             case 0:
-                if(isnatural(c)) actual = 1;
-                else if (c == '0') actual = 2;
+                if(c == '0') actual = 1;
                 else actual = udef;
                 break;
             case 1:
-                if(isdigit(c));
-                else if (c == '.') actual = 3;
+                if(isoctal(c));
                 else actual = udef;
                 break;
-            case 2:
-                if(isdigit(c) || c == '_') actual = 4;
-                else if (c == '.') actual = 3;
-                else actual = udef;
-                break;
-            case 3:
-                if(isdigit(c)) actual = 5;
-                else actual = udef;
-                break;
-            case 4:
-                if(isdigit(c));
-                else if (c == '.') actual = 3;
-                else actual = udef;
-                break;
-            case 5:
-                if(isdigit(5));
-                else actual = udef;
-                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
         }
     }
 
-    if (prior == 1 || prior == 2 || prior == 5) {
+    if (prior == 1) {
+        printf("%s: ", match);
         fallback();
         success();
-        return prior == 1 || prior == 2 ? _nat : _real;
+        return _oct;
     }
 
     fail();
@@ -191,6 +197,9 @@ token next() {
     
     token tid = id();
     if (tid != _err) return tid;
+
+    token toct = oct();
+    if (toct != _err) return toct;
 
     read();
     if (eof()) return _eof;
