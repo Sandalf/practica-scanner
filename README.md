@@ -30,8 +30,22 @@ Un número hexadecimal es una secuencia de longitud par pero no vacía de sí
 
 Por ejemplo 0x34, 0xA4f5, y 0XABCD son números hexadecimales, pero 0x, 0x98e y F3AE no lo son.
 
+## 5. Números reales
+Un número real consiste de dos partes: la primera es llamada la mantisa y la segunda el exponente.
+1. La mantisa, a su vez, consiste de dos partes: la parte entera y la parte decimal. La mantisa inicia con la parte entera, la cual consiste de 1) una secuencia no vacía de símbolos numéricos no inicializada en 0 (cero), o bien 2) de un solo 0. En el primer caso, la parte decimal es opcional. En el segundo caso la parte decimal es obligatoria.
+2. La parte decimal consiste de un punto (.) seguido de una secuencia no vacía de al menos un símbolo numérico.
+3. El exponente es opcional.
+4. El exponente inicia con la letra e (o E), seguida de un símbolo más (+) o menos (–), el cual es opcional.
+5. El exponente finaliza con una secuencia no vacía de caracteres numéricos.
+Ningún símbolo alfabético o el guión bajo puede aparecer inmediatamente después de un número real.
+
+Por ejemplo, 24, 0.3, 315.7, 0.4e+5, 83e-4 y 0.7E10 son números reales.
+
 ## Comandos
 compilacion
 ```
 g++ main.cpp scanner.cpp -o main.o
 ```
+
+## MC Alejandro Aguilar Cornejo
+
