@@ -54,10 +54,12 @@ bool isnatural(char c) {
 bool id() {
     int actual = 0;
     int prior = 0;
+    char match[100] = "";
+    int i = 0;
 
     while(actual != udef) {
         prior = actual;
-        char c = read();
+        char c = read();        
 
         switch (actual) {
             case 0:
@@ -69,19 +71,28 @@ bool id() {
                 if(isalpha(c) || isdigit(c) || c == '_');
                 else if(c == '\'') actual = 2;
                 else actual = udef;
+                break;
             case 2:
                 if(c == '\'');
                 else actual = udef;
+                break;
             case 3:
                 if(isdigit(c) || c == '_');
                 else if (isalpha(c)) actual = 1;
                 else actual = udef;
+                break;
             default:
                 break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
         }
     }
 
     if (prior == 1 || prior == 2) {
+        printf("%s: ", match);
         fallback();
         success();
         return true;
@@ -131,7 +142,7 @@ token num() {
         }
     }
 
-    if (prior == 1 || prior == 2 || prior == 5) {        
+    if (prior == 1 || prior == 2 || prior == 5) {
         fallback();
         success();
         return prior == 1 || prior == 2 ? _nat : _real;
@@ -160,6 +171,17 @@ bool eof() {
     return false;
 }
 
+int line(long* _q) {
+    long q = 0;
+    int c, line;
+    while ((c = fgetc(file)) != EOF && q < *_q) {
+        if (c == '\n') {            
+            ++line;
+        }
+    }
+    return line;
+}
+
 token next() {
     wsp();
     if (lastq == q && q != 0) return _eof;
@@ -170,6 +192,7 @@ token next() {
     if (eof()) return _eof;
 
     printf("Error en posición %ld\n", q);
+    printf("Linea %d\n", line(&q));
     
     return _err;
 }
