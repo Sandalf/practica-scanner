@@ -99,6 +99,7 @@ token id() {
     }
 
     fail();
+    printf("Token no identificado %s: ", match);
     return _err;
 }
 
