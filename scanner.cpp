@@ -51,7 +51,7 @@ bool isnatural(char c) {
     return false;
 }
 
-bool id() {
+token id() {
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -95,11 +95,11 @@ bool id() {
         printf("%s: ", match);
         fallback();
         success();
-        return true;
+        return _id;
     }
 
     fail();
-    return false;
+    return _err;
 }
 
 token num() {
@@ -171,14 +171,17 @@ bool eof() {
     return false;
 }
 
-int line(long* _q) {
+int line(long _q) {
     long q = 0;
-    int c, line;
-    while ((c = fgetc(file)) != EOF && q < *_q) {
-        if (c == '\n') {            
+    int line = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF && q < _q) {
+        q++;
+        if (c == '\n') {
             ++line;
         }
     }
+    ++line;
     return line;
 }
 
@@ -186,13 +189,17 @@ token next() {
     wsp();
     if (lastq == q && q != 0) return _eof;
 
-    if (id()) return _id;
+    token tid = id();
+    if (tid != _err) return tid;
 
     read();
     if (eof()) return _eof;
 
-    printf("Error en posición %ld\n", q);
-    printf("Linea %d\n", line(&q));
+    lastq = q;
+    q = 0;
+    fail();
+    printf("Error en posición %ld\n", lastq);
+    printf("Lineas %d\n", line(lastq));
     
     return _err;
 }
