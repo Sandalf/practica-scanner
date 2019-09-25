@@ -68,6 +68,29 @@ bool isoctal(char c) {
     return false;
 }
 
+bool ishex(char c) {
+    if (isdigit(c)) return true;    
+    switch (c)
+    {
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            return true;
+        break;
+    }
+
+    return false;
+}
+
 token id() {
     int actual = 0;
     int prior = 0;
@@ -158,6 +181,57 @@ token oct() {
     return _err;
 }
 
+token hex() {
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:
+                if(c == '0') actual = 1;
+                else actual = udef;
+                break;
+            case 1:
+                if(c == 'x' || c == 'X') actual = 2;
+                else actual = udef;
+                break;
+            case 2:
+                if(ishex(c)) actual = 3;
+                else actual = udef;
+                break;
+            case 3:
+                if(ishex(c)) actual = 4;
+                else actual = udef;
+                break;
+            case 4:
+                if(ishex(c)) actual = 3;
+                else actual = udef; 
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
+    }
+
+    if (prior == 4) {
+        printf("%s: ", match);
+        fallback();
+        success();
+        return _hex;
+    }
+
+    fail();
+    return _err;
+}
+
 bool wsp() {
     while(isspace(read()));
 
@@ -192,6 +266,7 @@ int line(long _q) {
 }
 
 token next() {
+    // printf("next\n");
     wsp();
     if (lastq == q && q != 0) return _eof;
     
@@ -200,6 +275,9 @@ token next() {
 
     token toct = oct();
     if (toct != _err) return toct;
+
+    token thex = hex();
+    if (thex != _err) return thex;
 
     read();
     if (eof()) return _eof;
