@@ -232,6 +232,74 @@ token hex() {
     return _err;
 }
 
+token real() {
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:
+                if(c == '0') actual = 1;
+                else if (isdigit(c)) actual = 2;
+                else actual = udef;
+                break;
+            case 1:
+                if(c == '.') actual = 3;
+                else actual = udef;
+                break;
+            case 2:
+                if(isdigit(c));
+                else if (c == '.') actual = 3;
+                else if (c == 'e' || c == 'E') actual = 5;
+                else actual = udef;
+                break;
+            case 3:
+                if(isdigit(c)) actual = 4;
+                else actual = udef;
+                break;
+            case 4:
+                if(isdigit(c)) actual = 4;
+                else if(c == 'e' || c == 'E') actual = 5;
+                else actual = udef;
+                break;
+            case 5:
+                if(c == '+' || c == '-') actual = 6;
+                else if (isdigit(c)) actual = 7;
+                else actual = udef; 
+                break;
+            case 6:
+                if(isdigit(c)) actual = 7;
+                else actual = udef; 
+                break;
+            case 7:
+                if(isdigit(c));
+                else actual = udef; 
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
+    }
+
+    if (prior == 2 || prior == 4 || prior == 7) {
+        printf("%s: ", match);
+        fallback();
+        success();
+        return _real;
+    }
+
+    fail();
+    return _err;
+}
+
 bool wsp() {
     while(isspace(read()));
 
@@ -266,7 +334,6 @@ int line(long _q) {
 }
 
 token next() {
-    // printf("next\n");
     wsp();
     if (lastq == q && q != 0) return _eof;
     
@@ -278,6 +345,9 @@ token next() {
 
     token thex = hex();
     if (thex != _err) return thex;
+
+    token treal = real();
+    if (treal != _err) return treal;
 
     read();
     if (eof()) return _eof;
