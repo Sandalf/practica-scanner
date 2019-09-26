@@ -68,26 +68,59 @@ bool isoctal(char c) {
     return false;
 }
 
-bool ishex(char c) {
-    if (isdigit(c)) return true;    
+// bool ishex(char c) {
+//     if (isdigit(c)) return true;    
+//     switch (c)
+//     {
+//         case 'A':
+//         case 'B':
+//         case 'C':
+//         case 'D':
+//         case 'E':
+//         case 'F':
+//         case 'a':
+//         case 'b':
+//         case 'c':
+//         case 'd':
+//         case 'e':
+//         case 'f':
+//             return true;
+//         break;
+//     }
+
+//     return false;
+// }
+
+bool isx(char c) {
     switch (c)
     {
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
+        case 'x':
+        case 'X':
             return true;
         break;
     }
+    return false;
+}
 
+bool isexponent(char c) {
+    switch (c)
+    {
+        case 'E':
+        case 'e':
+            return true;
+        break;
+    }
+    return false;
+}
+
+bool issign(char c) {
+    switch (c)
+    {
+        case '+':
+        case '-':
+            return true;
+        break;
+    }
     return false;
 }
 
@@ -201,15 +234,15 @@ token hex() {
                 else actual = udef;
                 break;
             case 2:
-                if(ishex(c)) actual = 3;
+                if(isxdigit(c)) actual = 3;
                 else actual = udef;
                 break;
             case 3:
-                if(ishex(c)) actual = 4;
+                if(isxdigit(c)) actual = 4;
                 else actual = udef;
                 break;
             case 4:
-                if(ishex(c)) actual = 3;
+                if(isxdigit(c)) actual = 3;
                 else actual = udef; 
                 break;
             default: break;
@@ -240,7 +273,7 @@ token real() {
 
     while(actual != udef) {
         prior = actual;
-        char c = read();
+        char c = read();        
 
         switch (actual) {
             case 0:
@@ -300,6 +333,96 @@ token real() {
     return _err;
 }
 
+token nums() {
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:
+                if(c == '0') actual = 1;
+                else if (isnatural(c)) actual = 2;
+                else actual = udef;
+                break;
+            case 1:
+                if(isoctal(c)) actual = 3;
+                else if (isx(c)) actual = 4;
+                else if (c == '.') actual = 5;
+                else actual = udef;
+                break;
+            case 2:
+                if(isdigit(c));
+                else if (isexponent(c)) actual = 6;
+                else if (c == '.') actual = 5;
+                else actual = udef;
+                break;
+            case 3:
+                if(isoctal(c));
+                else actual = udef;
+                break;
+            case 4:
+                if(isxdigit(c)) actual = 7;
+                else actual = udef;
+                break;
+            case 5:
+                if(isdigit(c)) actual = 8;
+                else actual = udef; 
+                break;
+            case 6:
+                if(isdigit(c)) actual = 9;
+                else if (issign(c)) actual = 10;
+                else actual = udef; 
+                break;
+            case 7:
+                if(isxdigit(c)) actual = 11;
+                else actual = udef; 
+                break;
+            case 8:
+                if(isdigit(c));
+                else if (isexponent(c)) actual = 6;
+                else actual = udef; 
+                break;
+            case 9:
+                if(isdigit(c));
+                else actual = udef; 
+                break;
+            case 10:
+                if(isdigit(c)) actual = 9;
+                else actual = udef; 
+                break;
+            case 11:
+                if(isxdigit(c)) actual = 7;
+                else actual = udef; 
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
+    }
+
+    if (prior == 1 || prior == 2 || prior == 3 || prior == 8 || prior == 9 || prior == 11) {
+        printf("%s: ", match);
+        fallback();
+        success();
+        if (prior == 1 || prior == 3) return _oct;
+        if (prior == 2 || prior == 8 || prior == 9) return _real;
+        if (prior == 11) return _hex;
+        return _real;
+    }
+
+    printf("%s: \n", match);
+    fail();
+    return _err;
+}
+
 bool wsp() {
     while(isspace(read()));
 
@@ -340,14 +463,8 @@ token next() {
     token tid = id();
     if (tid != _err) return tid;
 
-    token toct = oct();
-    if (toct != _err) return toct;
-
-    token thex = hex();
-    if (thex != _err) return thex;
-
-    token treal = real();
-    if (treal != _err) return treal;
+    token tnums = nums();
+    if (tnums != _err) return tnums;
 
     read();
     if (eof()) return _eof;
