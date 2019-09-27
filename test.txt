@@ -1,4 +1,4 @@
-identity hello : 123 ;
+identity hello : 123;
 24 0.3 315.7 0.4e+5 83e-4 0.7E10
 0x34 0xA4f5 0XABCD
 x_4' x _abc _3x cont''

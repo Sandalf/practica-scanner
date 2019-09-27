@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <ctype.h>
+#include <map>
+#include <string>
 #include <cstring>
 #include "scanner.hpp"
 
@@ -139,18 +141,11 @@ bool ispunctuation(char c) {
     return false;
 }
 
-// TODO: This must be a dictionary
-// bool isreserved(char[] c) {
-//     switch (c)
-//     {
-//         case "identity":
-//         case "transpose":
-//         case "throw":
-//             return true;
-//         break;
-//     }
-//     return false;
-// }
+std::map<std::string, token> reserved_words = {
+    { "identity", _identity },
+    { "transpose", _transpose },
+    { "throw", _throw }
+};
 
 token id() {
     int actual = 0;
@@ -370,25 +365,23 @@ token ids() {
     while(actual != udef) {
         prior = actual;
         char c = read();
+        // printf("ids:char = %c %d\n", c, isalnum(c));
 
         switch (actual) {
             case 0:            
                 if(isalpha(c)) actual = 1;
                 else if (c == '_') actual = 2;
-                else if (strncmp(match + c, "identity", 8) == 0 ||
-                strncmp(match + c, "transpose", 9) ||
-                strncmp(match + c, "throw", 5)) actual = 3;
                 else actual = udef;
                 break;
             case 1:
-                if(isalnum(c) || c == '_') actual = 1;
+                if(isalnum(c) || c == '_');
                 else if (c == '\'') actual = 4;
-                actual = udef;
+                else actual = udef;
                 break;
             case 2:
                 if(isdigit(c) || c == '_');
                 else if(isalpha(c)) actual = 1;
-                actual = udef;
+                else actual = udef;
                 break;
             case 3:
                 actual = udef;
@@ -405,13 +398,13 @@ token ids() {
             i += 1;
         }
     }
-
-    if (prior == 1 || prior == 3 || prior == 4) {
+    // printf("ids:prior = %d\n", prior);
+    bool isReservedWord = reserved_words.count(match) > 0;
+    if (prior == 1 || prior == 4 || isReservedWord) {
         printf("%s: ", match);
         fallback();
         success();
-        if (prior == 1 || prior == 4) return _id;
-        if (prior == 3) return _res;
+        return isReservedWord ? reserved_words.at(match) : _id;        
     }
   
     fail();
