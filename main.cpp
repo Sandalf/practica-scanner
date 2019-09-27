@@ -16,6 +16,7 @@ int main()
         // TODO: Print the string matched
         switch (t) {
             case _id: printf("Identificador\n"); break;
+            case _res: printf("Reservado\n"); break;
             case _oct: printf("Octal\n"); break;
             case _hex: printf("Hexadecimal\n"); break;
             case _real: printf("Real\n"); break;

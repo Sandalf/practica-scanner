@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <ctype.h>
+#include <cstring>
 #include "scanner.hpp"
 
 FILE *file;
@@ -137,6 +138,19 @@ bool ispunctuation(char c) {
     }
     return false;
 }
+
+// TODO: This must be a dictionary
+// bool isreserved(char[] c) {
+//     switch (c)
+//     {
+//         case "identity":
+//         case "transpose":
+//         case "throw":
+//             return true;
+//         break;
+//     }
+//     return false;
+// }
 
 token id() {
     int actual = 0;
@@ -347,6 +361,63 @@ token real() {
     return _err;
 }
 
+token ids() {
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;    
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:            
+                if(isalpha(c)) actual = 1;
+                else if (c == '_') actual = 2;
+                else if (strncmp(match + c, "identity", 8) == 0 ||
+                strncmp(match + c, "transpose", 9) ||
+                strncmp(match + c, "throw", 5)) actual = 3;
+                else actual = udef;
+                break;
+            case 1:
+                if(isalnum(c) || c == '_') actual = 1;
+                else if (c == '\'') actual = 4;
+                actual = udef;
+                break;
+            case 2:
+                if(isdigit(c) || c == '_');
+                else if(isalpha(c)) actual = 1;
+                actual = udef;
+                break;
+            case 3:
+                actual = udef;
+                break;
+            case 4:
+                if (c == '\'');
+                else actual = udef;  
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
+    }
+
+    if (prior == 1 || prior == 3 || prior == 4) {
+        printf("%s: ", match);
+        fallback();
+        success();
+        if (prior == 1 || prior == 4) return _id;
+        if (prior == 3) return _res;
+    }
+  
+    fail();
+    return _err;
+}
+
 token nums() {
     int actual = 0;
     int prior = 0;
@@ -451,7 +522,7 @@ token signs() {
                 else if (isarithmetic(c)) actual = 2;
                 else if (ispunctuation(c)) actual = 3;
                 else if (c == ':') actual = 4;
-                else { actual = udef; }
+                else actual = udef;
                 break;
             case 1:
                 actual = udef;
@@ -525,8 +596,8 @@ token next() {
     wsp();
     if (lastq == q && q != 0) return _eof;
     
-    token tid = id();
-    if (tid != _err) return tid;
+    token tids = ids();
+    if (tids != _err) return tids;
 
     token tnums = nums();
     if (tnums != _err) return tnums;
