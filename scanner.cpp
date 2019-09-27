@@ -68,29 +68,6 @@ bool isoctal(char c) {
     return false;
 }
 
-// bool ishex(char c) {
-//     if (isdigit(c)) return true;    
-//     switch (c)
-//     {
-//         case 'A':
-//         case 'B':
-//         case 'C':
-//         case 'D':
-//         case 'E':
-//         case 'F':
-//         case 'a':
-//         case 'b':
-//         case 'c':
-//         case 'd':
-//         case 'e':
-//         case 'f':
-//             return true;
-//         break;
-//     }
-
-//     return false;
-// }
-
 bool isx(char c) {
     switch (c)
     {
@@ -118,6 +95,43 @@ bool issign(char c) {
     {
         case '+':
         case '-':
+            return true;
+        break;
+    }
+    return false;
+}
+
+bool isdelimitation(char c) {
+    switch (c)
+    {
+        case '(':
+        case ')':
+        case '[':
+        case ']':
+            return true;
+        break;
+    }
+    return false;
+}
+
+bool isarithmetic(char c) {
+    switch (c)
+    {
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+            return true;
+        break;
+    }
+    return false;
+}
+
+bool ispunctuation(char c) {
+    switch (c)
+    {
+        case ',':
+        case ';':
             return true;
         break;
     }
@@ -415,10 +429,61 @@ token nums() {
         if (prior == 1 || prior == 3) return _oct;
         if (prior == 2 || prior == 8 || prior == 9) return _real;
         if (prior == 11) return _hex;
-        return _real;
+    }
+    
+    fail();
+    return _err;
+}
+
+token signs() {
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;    
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:
+                if(isdelimitation(c)) actual = 1;
+                else if (isarithmetic(c)) actual = 2;
+                else if (ispunctuation(c)) actual = 3;
+                else if (c == ':') actual = 4;
+                else { actual = udef; }
+                break;
+            case 1:
+                actual = udef;
+                break;
+            case 2:
+                actual = udef;
+                break;
+            case 3:
+                actual = udef;
+                break;
+            case 4:
+                actual = udef;
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
     }
 
-    printf("%s: \n", match);
+    if (prior == 1 || prior == 2 || prior == 3 || prior == 4) {
+        printf("%s: ", match);
+        fallback();
+        success();
+        if (prior == 1) return _del;
+        if (prior == 2) return _arit;
+        if (prior == 3) return _punct;
+        if (prior == 4) return _asign;
+    }
+  
     fail();
     return _err;
 }
@@ -465,6 +530,9 @@ token next() {
 
     token tnums = nums();
     if (tnums != _err) return tnums;
+
+    token tsings = signs();
+    if (tsings != _err) return tsings;
 
     read();
     if (eof()) return _eof;
