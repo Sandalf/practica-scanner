@@ -1,22 +1,24 @@
 #include <cstdio>
 #include <ctype.h>
-#include <string>
+#include <iostream>
 #include "scanner.hpp"
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {    
-    // TODO: Allow user to specify the file
-    open("test.txt");
+    char file[100] = "";
+    cout << "Ingresa una ruta de archivo: ";
+    cin >> file;
+
+    open(file);
     token t;
-    int i = 0;
+    int i = 5;
 
     do {
         i++;
         pair<token, char *> t = next();
-
-        // TODO: Print the string matched
+        
         switch (t.first) {
             case _id: printf("Identificador: %s\n", t.second); break;
             case _identity:

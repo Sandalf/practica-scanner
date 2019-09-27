@@ -44,7 +44,7 @@ Por ejemplo, 24, 0.3, 315.7, 0.4e+5, 83e-4 y 0.7E10 son números reales.
 ## Comandos
 compilacion
 ```
-g++ main.cpp scanner.cpp -o main.o
+g++ -std=c++11 main.cpp scanner.cpp -o main.o
 ```
 
 ## MC Alejandro Aguilar Cornejo

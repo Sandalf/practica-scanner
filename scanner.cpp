@@ -147,217 +147,7 @@ std::map<std::string, token> reserved_words = {
     { "throw", _throw }
 };
 
-token id() {
-    int actual = 0;
-    int prior = 0;
-    char match[100] = "";
-    int i = 0;
-
-    while(actual != udef) {
-        prior = actual;
-        char c = read();        
-
-        switch (actual) {
-            case 0:
-                if(isalpha(c)) actual = 1;
-                else if (c == '_') actual = 3;
-                else actual = udef;
-                break;
-            case 1:
-                if(isalpha(c) || isdigit(c) || c == '_');
-                else if(c == '\'') actual = 2;
-                else actual = udef;
-                break;
-            case 2:
-                if(c == '\'');
-                else actual = udef;
-                break;
-            case 3:
-                if(isdigit(c) || c == '_');
-                else if (isalpha(c)) actual = 1;
-                else actual = udef;
-                break;
-            default:
-                break;
-        }
-
-        if (actual != udef) {
-            match[i] = c;
-            i += 1;
-        }
-    }
-
-    if (prior == 1 || prior == 2) {
-        printf("%s: ", match);
-        fallback();
-        success();
-        return _id;
-    }
-
-    fail();    
-    return _err;
-}
-
-token oct() {
-    int actual = 0;
-    int prior = 0;
-    char match[100] = "";
-    int i = 0;
-
-    while(actual != udef) {
-        prior = actual;
-        char c = read();
-
-        switch (actual) {
-            case 0:
-                if(c == '0') actual = 1;
-                else actual = udef;
-                break;
-            case 1:
-                if(isoctal(c));
-                else actual = udef;
-                break;
-            default: break;
-        }
-
-        if (actual != udef) {
-            match[i] = c;
-            i += 1;
-        }
-    }
-
-    if (prior == 1) {
-        printf("%s: ", match);
-        fallback();
-        success();
-        return _oct;
-    }
-
-    fail();
-    return _err;
-}
-
-token hex() {
-    int actual = 0;
-    int prior = 0;
-    char match[100] = "";
-    int i = 0;
-
-    while(actual != udef) {
-        prior = actual;
-        char c = read();
-
-        switch (actual) {
-            case 0:
-                if(c == '0') actual = 1;
-                else actual = udef;
-                break;
-            case 1:
-                if(c == 'x' || c == 'X') actual = 2;
-                else actual = udef;
-                break;
-            case 2:
-                if(isxdigit(c)) actual = 3;
-                else actual = udef;
-                break;
-            case 3:
-                if(isxdigit(c)) actual = 4;
-                else actual = udef;
-                break;
-            case 4:
-                if(isxdigit(c)) actual = 3;
-                else actual = udef; 
-                break;
-            default: break;
-        }
-
-        if (actual != udef) {
-            match[i] = c;
-            i += 1;
-        }
-    }
-
-    if (prior == 4) {
-        printf("%s: ", match);
-        fallback();
-        success();
-        return _hex;
-    }
-
-    fail();
-    return _err;
-}
-
-token real() {
-    int actual = 0;
-    int prior = 0;
-    char match[100] = "";
-    int i = 0;
-
-    while(actual != udef) {
-        prior = actual;
-        char c = read();        
-
-        switch (actual) {
-            case 0:
-                if(c == '0') actual = 1;
-                else if (isdigit(c)) actual = 2;
-                else actual = udef;
-                break;
-            case 1:
-                if(c == '.') actual = 3;
-                else actual = udef;
-                break;
-            case 2:
-                if(isdigit(c));
-                else if (c == '.') actual = 3;
-                else if (c == 'e' || c == 'E') actual = 5;
-                else actual = udef;
-                break;
-            case 3:
-                if(isdigit(c)) actual = 4;
-                else actual = udef;
-                break;
-            case 4:
-                if(isdigit(c)) actual = 4;
-                else if(c == 'e' || c == 'E') actual = 5;
-                else actual = udef;
-                break;
-            case 5:
-                if(c == '+' || c == '-') actual = 6;
-                else if (isdigit(c)) actual = 7;
-                else actual = udef; 
-                break;
-            case 6:
-                if(isdigit(c)) actual = 7;
-                else actual = udef; 
-                break;
-            case 7:
-                if(isdigit(c));
-                else actual = udef; 
-                break;
-            default: break;
-        }
-
-        if (actual != udef) {
-            match[i] = c;
-            i += 1;
-        }
-    }
-
-    if (prior == 2 || prior == 4 || prior == 7) {
-        printf("%s: ", match);
-        fallback();
-        success();
-        return _real;
-    }
-
-    fail();
-    return _err;
-}
-
 std::pair<token, char*> ids() {
-    printf("Ids\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -366,7 +156,6 @@ std::pair<token, char*> ids() {
     while(actual != udef) {
         prior = actual;
         char c = read();
-        // printf("ids:char = %c %d\n", c, isalnum(c));
 
         switch (actual) {
             case 0:            
@@ -399,7 +188,7 @@ std::pair<token, char*> ids() {
             i += 1;
         }
     }
-    // printf("ids:prior = %d\n", prior);
+    
     bool isReservedWord = reserved_words.count(match) > 0;
     if (prior == 1 || prior == 4 || isReservedWord) {
         fallback();
@@ -413,7 +202,6 @@ std::pair<token, char*> ids() {
 }
 
 std::pair<token, char*> nums() {
-    printf("Nums\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -487,10 +275,10 @@ std::pair<token, char*> nums() {
             i += 1;
         }
     }
-
+    
     if (prior == 1 || prior == 2 || prior == 3 || prior == 8 || prior == 9 || prior == 11) {
         fallback();
-        success();
+        success();        
         token t;
         if (prior == 1 || prior == 3) t = _oct;
         if (prior == 2 || prior == 8 || prior == 9) t = _real;
@@ -503,7 +291,6 @@ std::pair<token, char*> nums() {
 }
 
 std::pair<token, char*> signs() {
-    printf("Signs\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -512,7 +299,6 @@ std::pair<token, char*> signs() {
     while(actual != udef) {
         prior = actual;
         char c = read();
-        printf("signs:char %c\n", c);
 
         switch (actual) {
             case 0:
@@ -603,7 +389,6 @@ std::pair<token, char*> next() {
 
     std::pair<token, char*> tsings = signs();
     if (tsings.first != _err) return tsings;
-    printf("Is not sign\n");
 
     read();
     if (eof()) return std::make_pair(_eof, (char*)"");
