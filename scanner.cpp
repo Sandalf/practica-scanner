@@ -356,7 +356,8 @@ token real() {
     return _err;
 }
 
-token ids() {
+std::pair<token, char*> ids() {
+    printf("Ids\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -401,17 +402,18 @@ token ids() {
     // printf("ids:prior = %d\n", prior);
     bool isReservedWord = reserved_words.count(match) > 0;
     if (prior == 1 || prior == 4 || isReservedWord) {
-        printf("%s: ", match);
         fallback();
         success();
-        return isReservedWord ? reserved_words.at(match) : _id;        
+        if (isReservedWord) return std::make_pair(reserved_words[match], match);
+        return std::make_pair(_id, match);
     }
   
     fail();
-    return _err;
+    return std::make_pair(_err, match);
 }
 
-token nums() {
+std::pair<token, char*> nums() {
+    printf("Nums\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -487,19 +489,21 @@ token nums() {
     }
 
     if (prior == 1 || prior == 2 || prior == 3 || prior == 8 || prior == 9 || prior == 11) {
-        printf("%s: ", match);
         fallback();
         success();
-        if (prior == 1 || prior == 3) return _oct;
-        if (prior == 2 || prior == 8 || prior == 9) return _real;
-        if (prior == 11) return _hex;
+        token t;
+        if (prior == 1 || prior == 3) t = _oct;
+        if (prior == 2 || prior == 8 || prior == 9) t = _real;
+        if (prior == 11) t = _hex;
+        return std::make_pair(t, match);
     }
     
     fail();
-    return _err;
+    return std::make_pair(_err, match);
 }
 
-token signs() {
+std::pair<token, char*> signs() {
+    printf("Signs\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -508,6 +512,7 @@ token signs() {
     while(actual != udef) {
         prior = actual;
         char c = read();
+        printf("signs:char %c\n", c);
 
         switch (actual) {
             case 0:
@@ -539,17 +544,18 @@ token signs() {
     }
 
     if (prior == 1 || prior == 2 || prior == 3 || prior == 4) {
-        printf("%s: ", match);
         fallback();
         success();
-        if (prior == 1) return _del;
-        if (prior == 2) return _arit;
-        if (prior == 3) return _punct;
-        if (prior == 4) return _asign;
+        token t;
+        if (prior == 1) t = _del;
+        if (prior == 2) t = _arit;
+        if (prior == 3) t = _punct;
+        if (prior == 4) t = _asign;
+        return std::make_pair(t, match);
     }
   
     fail();
-    return _err;
+    return std::make_pair(_err, match);
 }
 
 bool wsp() {
@@ -585,21 +591,22 @@ int line(long _q) {
     return line;
 }
 
-token next() {
+std::pair<token, char*> next() {
     wsp();
-    if (lastq == q && q != 0) return _eof;
+    if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
     
-    token tids = ids();
-    if (tids != _err) return tids;
+    std::pair<token, char*> tids = ids();
+    if (tids.first != _err) return tids;
 
-    token tnums = nums();
-    if (tnums != _err) return tnums;
+    std::pair<token, char*> tnums = nums();
+    if (tnums.first != _err) return tnums;
 
-    token tsings = signs();
-    if (tsings != _err) return tsings;
+    std::pair<token, char*> tsings = signs();
+    if (tsings.first != _err) return tsings;
+    printf("Is not sign\n");
 
     read();
-    if (eof()) return _eof;
+    if (eof()) return std::make_pair(_eof, (char*)"");
 
     lastq = q;
     q = 0;
@@ -607,5 +614,5 @@ token next() {
     printf("Error en posición %ld\n", lastq);
     printf("Linea %d\n", line(lastq));
     
-    return _err;
+    return std::make_pair(_err, (char*)"");
 }

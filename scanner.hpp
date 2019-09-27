@@ -5,6 +5,6 @@ typedef enum { _id, _res, _identity, _transpose, _throw, _nat, _real, _oct, _hex
 
 extern void open(const char *fname);
 extern void close();
-extern token next();
+extern std::pair<token, char*> next();
 
 #endif
