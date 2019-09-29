@@ -192,9 +192,9 @@ std::pair<token, char*> ids() {
     bool isReservedWord = reserved_words.count(match) > 0;
     if (prior == 1 || prior == 4 || isReservedWord) {
         fallback();
-        success();
-        if (isReservedWord) return std::make_pair(reserved_words[match], match);
-        return std::make_pair(_id, match);
+        success();        
+        token t = isReservedWord ? reserved_words[match] : _id;
+        return std::make_pair(t, match);
     }
   
     fail();
@@ -379,9 +379,11 @@ int line(long _q) {
 
 std::pair<token, char*> next() {
     wsp();
+    printf("lastq = %ld\n", lastq);
+    printf("q = %ld\n", q);
     if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
     
-    std::pair<token, char*> tids = ids();
+    std::pair<token, char*> tids = ids();    
     if (tids.first != _err) return tids;
 
     std::pair<token, char*> tnums = nums();

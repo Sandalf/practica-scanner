@@ -7,35 +7,37 @@ using namespace std;
 
 int main(int argc, char** argv)
 {    
-    char file[100] = "";
-    cout << "Ingresa una ruta de archivo: ";
-    cin >> file;
+    printf("SCANNER\n");
+    // char file[100] = "";
+    // cout << "Ingresa una ruta de archivo: ";
+    // cin >> file;
 
-    open(file);
+    open("test.txt");
     token t;
-    int i = 5;
+    char* match;
 
     do {
-        i++;
-        pair<token, char *> t = next();
+        pair<token, char *> res = next();
+        t = res.first;
+        match = res.second;
         
-        switch (t.first) {
-            case _id: printf("Identificador: %s\n", t.second); break;
+        switch (t) {
+            case _id: printf("Identificador: %s\n", match); break;
             case _identity:
             case _transpose:
-            case _throw: printf("Palabra reservada: %s\n", t.second); break;
-            case _oct: printf("Octal: %s\n", t.second); break;
-            case _hex: printf("Hexadecimal: %s\n", t.second); break;
-            case _real: printf("Real: %s\n", t.second); break;
-            case _del: printf("Delimante: %s\n", t.second); break;
-            case _arit: printf("Aritmetico: %s\n", t.second); break;
-            case _punct: printf("Puntuación: %s\n", t.second); break;
-            case _asign: printf("Asignación: %s\n", t.second); break;
-            case _eof: printf("EOF: %s\n", t.second); break;
-            case _err: printf("Error: %s\n", t.second); break;
+            case _throw: printf("Palabra reservada: %s\n", match); break;
+            case _oct: printf("Octal: %s\n", match); break;
+            case _hex: printf("Hexadecimal: %s\n", match); break;
+            case _real: printf("Real: %s\n", match); break;
+            case _del: printf("Delimante: %s\n", match); break;
+            case _arit: printf("Aritmetico: %s\n", match); break;
+            case _punct: printf("Puntuación: %s\n", match); break;
+            case _asign: printf("Asignación: %s\n", match); break;
+            case _eof: printf("EOF: %s\n", match); break;
+            case _err: printf("Error: %s\n", match); break;
             default: break;
         }
-    } while(t != _eof && t != _err && i < 50);
+    } while(t != _eof && t != _err);
 
     close();
     return 0;
