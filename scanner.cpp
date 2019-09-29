@@ -8,10 +8,18 @@
 FILE *file;
 long q;
 long lastq = -1;
+bool endoffile = false;
 const int udef = -1;
 
 void open(const char *fname) {
     file = fopen(fname, "r");
+    // fseek(file, 0, SEEK_END);
+    // endoffile = ftell(file);
+    // printf("End of file %ld\n", endoffile);
+    // printf("Last character %d\n", fgetc(file));
+    // fseek(file, 0, SEEK_SET);
+    // printf("Beggining of file %ld\n", ftell(file));
+    // printf("First character %d\n", fgetc(file));
     q = 0;
 }
 
@@ -20,7 +28,16 @@ void close() {
 }
 
 char read() {
-    return fgetc(file);
+    // printf("\n");
+    char c = fgetc(file);
+    // printf("Read:char = %c\n", c);
+    // printf("Read:position = %ld\n", ftell(file));
+    if(c == EOF) { 
+        printf("\nEND OF FILE\n");
+        endoffile = true;
+    }
+    return c;
+    // return fgetc(file);
 }
 
 void success() {
@@ -148,6 +165,7 @@ std::map<std::string, token> reserved_words = {
 };
 
 std::pair<token, char*> ids() {
+    printf("\nIds\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -155,7 +173,7 @@ std::pair<token, char*> ids() {
 
     while(actual != udef) {
         prior = actual;
-        char c = read();
+        char c = read();        
 
         switch (actual) {
             case 0:            
@@ -202,6 +220,7 @@ std::pair<token, char*> ids() {
 }
 
 std::pair<token, char*> nums() {
+    printf("\nNums\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -278,7 +297,7 @@ std::pair<token, char*> nums() {
     
     if (prior == 1 || prior == 2 || prior == 3 || prior == 8 || prior == 9 || prior == 11) {
         fallback();
-        success();        
+        success();
         token t;
         if (prior == 1 || prior == 3) t = _oct;
         if (prior == 2 || prior == 8 || prior == 9) t = _real;
@@ -291,6 +310,7 @@ std::pair<token, char*> nums() {
 }
 
 std::pair<token, char*> signs() {
+    printf("\nSigns\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -329,7 +349,7 @@ std::pair<token, char*> signs() {
         }
     }
 
-    if (prior == 1 || prior == 2 || prior == 3 || prior == 4) {
+    if (prior == 1 || prior == 2 || prior == 3 || prior == 4) {        
         fallback();
         success();
         token t;
@@ -339,12 +359,13 @@ std::pair<token, char*> signs() {
         if (prior == 4) t = _asign;
         return std::make_pair(t, match);
     }
-  
+      
     fail();
     return std::make_pair(_err, match);
 }
 
 bool wsp() {
+    printf("\nRemove white space\n");
     while(isspace(read()));
 
     fallback();
@@ -354,12 +375,12 @@ bool wsp() {
 }
 
 bool eof() {
-    if (read() == EOF) {
-        fallback();
-        return true;
-    }
+    printf("\nEnd of file\n");
+    read();
+    if (feof(file)) return true;
 
     fallback();
+    success();
     return false;
 }
 
@@ -378,10 +399,17 @@ int line(long _q) {
 }
 
 std::pair<token, char*> next() {
+    if (endoffile) return std::make_pair(_eof, (char*)"");
+
     wsp();
+
+    printf("\n");
     printf("lastq = %ld\n", lastq);
     printf("q = %ld\n", q);
-    if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
+    // if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
+    // read();
+    // if (eof()) return std::make_pair(_eof, (char*)"");
+    // if ( q == 21) return std::make_pair(_eof, (char*)"");
     
     std::pair<token, char*> tids = ids();    
     if (tids.first != _err) return tids;
