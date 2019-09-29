@@ -22,6 +22,8 @@ int main(int argc, char** argv)
         match = res.second;
         
         switch (t) {
+            // TODO: Remover impresión de comentario encontrado
+            case _comment: printf("Comentario: %s\n", match); break;
             case _id: printf("Identificador: %s\n", match); break;
             case _identity:
             case _transpose:

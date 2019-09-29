@@ -1,1 +1,11 @@
-identity hello : 123;
+uno _dos _34tres, cuatro'', #234io
+_cinco'34;
+identity,transpose,throw; #nada
+0456,0, 0, 34, 34.5, 4e+5, 3e-4, 0.4E10,
+# Comentario
+# 34.2_er
+[]()
+x: 3+4-5*5/123;
+Espacios        en
+
+  blanco                final;

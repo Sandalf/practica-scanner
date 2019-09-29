@@ -33,7 +33,7 @@ char read() {
     // printf("Read:char = %c\n", c);
     // printf("Read:position = %ld\n", ftell(file));
     if(c == EOF) { 
-        printf("\nEND OF FILE\n");
+        // printf("\nEND OF FILE\n");
         endoffile = true;
     }
     return c;
@@ -165,7 +165,7 @@ std::map<std::string, token> reserved_words = {
 };
 
 std::pair<token, char*> ids() {
-    printf("\nIds\n");
+    // printf("\nIds\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -220,7 +220,7 @@ std::pair<token, char*> ids() {
 }
 
 std::pair<token, char*> nums() {
-    printf("\nNums\n");
+    // printf("\nNums\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -310,7 +310,7 @@ std::pair<token, char*> nums() {
 }
 
 std::pair<token, char*> signs() {
-    printf("\nSigns\n");
+    // printf("\nSigns\n");
     int actual = 0;
     int prior = 0;
     char match[100] = "";
@@ -364,8 +364,59 @@ std::pair<token, char*> signs() {
     return std::make_pair(_err, match);
 }
 
+std::pair<token, char*> comments() {
+    // printf("\nComments\n");
+    int actual = 0;
+    int prior = 0;
+    char match[100] = "";
+    int i = 0;    
+
+    while(actual != udef) {
+        prior = actual;
+        char c = read();
+
+        switch (actual) {
+            case 0:
+                if(c == '#') actual = 1;
+                else actual = udef;
+                break;
+            case 1:
+                if(isalnum(c) ||
+                    isdelimitation(c) ||
+                    isarithmetic(c) ||
+                    ispunctuation(c) ||
+                    isblank(c) ||
+                    c == ':' ||
+                    c == '_' ||
+                    c == '\'' ||
+                    c == '.');
+                else if (c == '\n') actual = 2;
+                else actual = udef;
+                break;
+            case 2:
+                actual = udef;
+                break;
+            default: break;
+        }
+
+        if (actual != udef) {
+            match[i] = c;
+            i += 1;
+        }
+    }
+
+    if (prior == 2) {
+        fallback();
+        success();
+        return std::make_pair(_comment, match);
+    }
+      
+    fail();
+    return std::make_pair(_err, match);
+}
+
 bool wsp() {
-    printf("\nRemove white space\n");
+    // printf("\nRemove white space\n");
     while(isspace(read()));
 
     fallback();
@@ -375,9 +426,15 @@ bool wsp() {
 }
 
 bool eof() {
-    printf("\nEnd of file\n");
-    read();
-    if (feof(file)) return true;
+    // printf("\nEnd of file\n");
+    char c = read();
+    if(c == EOF) {
+        fallback();
+        success();
+        return true;
+    }
+    // read();
+    // if (feof(file)) return true;
 
     fallback();
     success();
@@ -400,16 +457,20 @@ int line(long _q) {
 
 std::pair<token, char*> next() {
     if (endoffile) return std::make_pair(_eof, (char*)"");
+    // if (eof()) return std::make_pair(_eof, (char*)"");
 
     wsp();
 
-    printf("\n");
-    printf("lastq = %ld\n", lastq);
-    printf("q = %ld\n", q);
+    // printf("\n");
+    // printf("lastq = %ld\n", lastq);
+    // printf("q = %ld\n", q);
     // if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
     // read();
     // if (eof()) return std::make_pair(_eof, (char*)"");
     // if ( q == 21) return std::make_pair(_eof, (char*)"");
+
+    std::pair<token, char*> tcom = comments();    
+    if (tcom.first != _err) return tcom;
     
     std::pair<token, char*> tids = ids();    
     if (tids.first != _err) return tids;
