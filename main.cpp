@@ -41,6 +41,8 @@ int main(int argc, char** argv)
         }
     } while(t != _eof && t != _err);
 
+    printf("Fin del programa\n");
+
     close();
     return 0;
 }

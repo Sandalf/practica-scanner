@@ -436,8 +436,7 @@ bool eof() {
     // read();
     // if (feof(file)) return true;
 
-    fallback();
-    success();
+    fail();
     return false;
 }
 
@@ -457,17 +456,8 @@ int line(long _q) {
 
 std::pair<token, char*> next() {
     if (endoffile) return std::make_pair(_eof, (char*)"");
-    // if (eof()) return std::make_pair(_eof, (char*)"");
 
     wsp();
-
-    // printf("\n");
-    // printf("lastq = %ld\n", lastq);
-    // printf("q = %ld\n", q);
-    // if (lastq == q && q != 0) return std::make_pair(_eof, (char*)"");
-    // read();
-    // if (eof()) return std::make_pair(_eof, (char*)"");
-    // if ( q == 21) return std::make_pair(_eof, (char*)"");
 
     std::pair<token, char*> tcom = comments();    
     if (tcom.first != _err) return tcom;
@@ -483,12 +473,9 @@ std::pair<token, char*> next() {
 
     read();
     if (eof()) return std::make_pair(_eof, (char*)"");
-
-    lastq = q;
-    q = 0;
-    fail();
-    printf("Error en posición %ld\n", lastq);
-    printf("Linea %d\n", line(lastq));
     
-    return std::make_pair(_err, (char*)"");
+    printf("Token no identificado %c\n", read());
+    printf("En la linea %d\n", line(lastq));
+
+    return std::make_pair(_err, (char *)"");
 }
